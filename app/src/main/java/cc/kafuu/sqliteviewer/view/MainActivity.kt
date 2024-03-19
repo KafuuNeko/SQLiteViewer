@@ -1,5 +1,7 @@
 package cc.kafuu.sqliteviewer.view
 
+import android.util.Log
+import android.widget.Toast
 import cc.kafuu.sqliteviewer.BR
 import cc.kafuu.sqliteviewer.R
 import cc.kafuu.sqliteviewer.common.core.CoreActivity
@@ -11,6 +13,10 @@ class MainActivity : CoreActivity<ActivityMainBinding, MainViewModel>(
     R.layout.activity_main,
     BR.viewModel
 ) {
+    companion object {
+        private const val TAG = "MainActivity"
+    }
+
     override fun initViews() {
 
     }
