@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">SQLiteViewer</string>
     <string name="back_content_description">返回上一个页面</string>
+    <string name="iv_app_content_description">一个数据库图标</string>
     <string name="btn_create_db_text">创建数据库</string>
-    <string name="btn_open_db_text">打开数据库</string>
+    <string name="btn_import_db_text">导入数据库</string>
+    <string name="database_not_found">数据库路径为空</string>
 </resources>

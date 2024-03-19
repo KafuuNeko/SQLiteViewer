@@ -10,15 +10,13 @@ import androidx.core.content.ContextCompat
 @SuppressLint("StaticFieldLeak")
 object CommonLibs {
     private lateinit var mContext: Context
+    val context: Context get() = mContext
+
     fun init(context: Context) {
         mContext = context
     }
 
-    fun requestContext(): Context {
-        return mContext
-    }
-
-    fun getString(@StringRes id: Int) = requestContext().resources?.getString(id).toString()
-    fun getColor(@ColorRes color: Int) = ContextCompat.getColor(requestContext(), color)
-    fun getDrawable(@DrawableRes id: Int) = ContextCompat.getDrawable(requestContext(), id)
+    fun getString(@StringRes id: Int) = context.resources?.getString(id).toString()
+    fun getColor(@ColorRes color: Int) = ContextCompat.getColor(context, color)
+    fun getDrawable(@DrawableRes id: Int) = ContextCompat.getDrawable(context, id)
 }

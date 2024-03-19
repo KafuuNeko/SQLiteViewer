@@ -1,11 +1,11 @@
 package cc.kafuu.sqliteviewer.common.core
 
 import android.os.Bundle
-import android.os.PersistableBundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.ViewModelProvider
+import cc.kafuu.sqliteviewer.common.manager.ActivityStackManager
 
 
 abstract class CoreActivity<V : ViewDataBinding, VM : CoreViewModel> (
@@ -16,16 +16,24 @@ abstract class CoreActivity<V : ViewDataBinding, VM : CoreViewModel> (
     protected lateinit var mViewDataBinding: V
     protected lateinit var mViewModel: VM
 
-    protected abstract fun initViews()
+    protected abstract fun init()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        ActivityStackManager.pushActivity(this)
         mViewDataBinding = DataBindingUtil.setContentView(this, layoutId)
         mViewModel = ViewModelProvider(this)[vmClass]
         if (viewModelId != 0) {
             mViewDataBinding.setVariable(viewModelId, mViewModel)
         }
         mViewDataBinding.lifecycleOwner = this
-        initViews()
+        init()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if (isFinishing) {
+            ActivityStackManager.removeActivity(this)
+        }
     }
 }
