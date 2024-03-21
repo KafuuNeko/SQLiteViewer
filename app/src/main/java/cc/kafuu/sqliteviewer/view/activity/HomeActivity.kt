@@ -3,21 +3,18 @@ package cc.kafuu.sqliteviewer.view.activity
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Canvas
 import android.net.Uri
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import cc.kafuu.sqliteviewer.BR
 import cc.kafuu.sqliteviewer.R
 import cc.kafuu.sqliteviewer.common.adapter.DatabaseListAdapter
 import cc.kafuu.sqliteviewer.common.core.CoreActivity
 import cc.kafuu.sqliteviewer.common.utils.CommonLibs
-import cc.kafuu.sqliteviewer.common.utils.getFileName
+import cc.kafuu.sqliteviewer.common.utils.FileUtils.getFileName
 import cc.kafuu.sqliteviewer.databinding.ActivityHomeBinding
 import cc.kafuu.sqliteviewer.viewmodel.HomeViewModel
 import java.io.IOException
@@ -92,7 +89,8 @@ class HomeActivity : CoreActivity<ActivityHomeBinding, HomeViewModel>(
                 if (mViewModel.importSqlite(fileName, inputStream)) {
                     mViewModel.doLoadSqliteFiles()
                 } else {
-                    Toast.makeText(this, R.string.import_database_failed_tip, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, R.string.import_database_failed_tip, Toast.LENGTH_SHORT)
+                        .show()
                 }
             } ?: return
         } catch (e: IOException) {

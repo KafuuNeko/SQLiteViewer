@@ -8,15 +8,15 @@ import android.provider.DocumentsContract
 import android.provider.DocumentsProvider
 import android.util.Log
 import cc.kafuu.sqliteviewer.common.utils.CommonLibs
+import cc.kafuu.sqliteviewer.common.utils.MimeTypeUtils
 import java.io.File
 import java.io.FileNotFoundException
-import java.util.Locale
 
 class StorageProvider : DocumentsProvider() {
     companion object {
         private const val TAG = "StorageProvider"
 
-        private val defaultDocumentProjection = arrayOf(
+        private val DEFAULT_DOCUMENT_PROJECTION = arrayOf(
             DocumentsContract.Document.COLUMN_DOCUMENT_ID,
             DocumentsContract.Document.COLUMN_DISPLAY_NAME,
             DocumentsContract.Document.COLUMN_FLAGS,
@@ -25,13 +25,25 @@ class StorageProvider : DocumentsProvider() {
             DocumentsContract.Document.COLUMN_LAST_MODIFIED
         )
 
-        private val defaultRootProjection = arrayOf(
+        private val DEFAULT_ROOT_PROJECTION = arrayOf(
             DocumentsContract.Root.COLUMN_ROOT_ID,
             DocumentsContract.Root.COLUMN_TITLE,
             DocumentsContract.Root.COLUMN_FLAGS,
             DocumentsContract.Root.COLUMN_DOCUMENT_ID,
             DocumentsContract.Root.COLUMN_ICON
         )
+
+        private const val DOCUMENT_FLAGS = DocumentsContract.Document.FLAG_SUPPORTS_COPY or
+                DocumentsContract.Document.FLAG_DIR_SUPPORTS_CREATE or
+                DocumentsContract.Document.FLAG_SUPPORTS_WRITE or
+                DocumentsContract.Document.FLAG_SUPPORTS_DELETE or
+                DocumentsContract.Document.FLAG_SUPPORTS_RENAME or
+                DocumentsContract.Document.FLAG_SUPPORTS_MOVE or
+                DocumentsContract.Document.FLAG_SUPPORTS_REMOVE
+
+        private const val ROOT_FLAGS = DocumentsContract.Root.FLAG_SUPPORTS_CREATE or
+                DocumentsContract.Root.FLAG_SUPPORTS_RECENTS or
+                DocumentsContract.Root.FLAG_SUPPORTS_SEARCH
     }
 
     override fun onCreate(): Boolean {
@@ -40,12 +52,12 @@ class StorageProvider : DocumentsProvider() {
 
     override fun queryRoots(projection: Array<out String>?): Cursor {
         Log.d(TAG, "queryRoots: ")
-        val result = MatrixCursor(projection ?: defaultRootProjection)
+        val result = MatrixCursor(projection ?: DEFAULT_ROOT_PROJECTION)
 
         result.newRow().apply {
             add(DocumentsContract.Root.COLUMN_ROOT_ID, "/share")
             add(DocumentsContract.Root.COLUMN_TITLE, CommonLibs.getString(R.string.app_name))
-            add(DocumentsContract.Root.COLUMN_FLAGS, DocumentsContract.Root.FLAG_SUPPORTS_CREATE or DocumentsContract.Root.FLAG_SUPPORTS_RECENTS or DocumentsContract.Root.FLAG_SUPPORTS_SEARCH)
+            add(DocumentsContract.Root.COLUMN_FLAGS, ROOT_FLAGS)
             add(DocumentsContract.Root.COLUMN_DOCUMENT_ID, "/share")
             add(DocumentsContract.Root.COLUMN_ICON, R.drawable.ic_launcher)
         }
@@ -55,7 +67,7 @@ class StorageProvider : DocumentsProvider() {
 
 
     override fun queryDocument(documentId: String?, projection: Array<out String>?) =
-        MatrixCursor(projection ?: defaultDocumentProjection).apply {
+        MatrixCursor(projection ?: DEFAULT_DOCUMENT_PROJECTION).apply {
             if (documentId == null) {
                 return@apply
             }
@@ -71,7 +83,7 @@ class StorageProvider : DocumentsProvider() {
         parentDocumentId: String?,
         projection: Array<out String>?,
         sortOrder: String?
-    ) = MatrixCursor(projection ?: defaultDocumentProjection).apply {
+    ) = MatrixCursor(projection ?: DEFAULT_DOCUMENT_PROJECTION).apply {
         if (parentDocumentId == null) {
             return@apply
         }
@@ -138,41 +150,10 @@ class StorageProvider : DocumentsProvider() {
         return accessMode
     }
 
-
-    private fun getTypeForFile(file: File): String {
-        if (!file.isFile) {
-            return DocumentsContract.Document.MIME_TYPE_DIR
-        }
-        val name = file.name.lowercase(Locale.ROOT)
-        return when {
-            name.endsWith(".txt") -> "text/plain"
-            name.endsWith(".html") || name.endsWith(".htm") -> "text/html"
-            name.endsWith(".jpg") || name.endsWith(".jpeg") -> "image/jpeg"
-            name.endsWith(".png") -> "image/png"
-            name.endsWith(".gif") -> "image/gif"
-            name.endsWith(".pdf") -> "application/pdf"
-            name.endsWith(".doc") || name.endsWith(".docx") -> "application/msword"
-            name.endsWith(".xls") || name.endsWith(".xlsx") -> "application/vnd.ms-excel"
-            name.endsWith(".ppt") || name.endsWith(".pptx") -> "application/vnd.ms-powerpoint"
-            name.endsWith(".zip") -> "application/zip"
-            name.endsWith(".rar") -> "application/x-rar-compressed"
-            name.endsWith(".sqlite") || name.endsWith(".sdb") || name.endsWith(".db") -> "application/x-sqlite3"
-            else -> "application/octet-stream"
-        }
-    }
-
     private fun MatrixCursor.RowBuilder.fileRow(file: File, documentId: String) {
-        val flags = DocumentsContract.Document.FLAG_SUPPORTS_COPY
-            .or(DocumentsContract.Document.FLAG_DIR_SUPPORTS_CREATE)
-            .or(DocumentsContract.Document.FLAG_SUPPORTS_WRITE)
-            .or(DocumentsContract.Document.FLAG_SUPPORTS_DELETE)
-            .or(DocumentsContract.Document.FLAG_SUPPORTS_RENAME)
-            .or(DocumentsContract.Document.FLAG_SUPPORTS_MOVE)
-            .or(DocumentsContract.Document.FLAG_SUPPORTS_REMOVE)
-
         add(DocumentsContract.Document.COLUMN_DOCUMENT_ID, documentId)
-        add(DocumentsContract.Document.COLUMN_MIME_TYPE, getTypeForFile(file))
-        add(DocumentsContract.Document.COLUMN_FLAGS, flags)
+        add(DocumentsContract.Document.COLUMN_MIME_TYPE, MimeTypeUtils.getTypeForFileBySuffix(file))
+        add(DocumentsContract.Document.COLUMN_FLAGS, DOCUMENT_FLAGS)
         add(DocumentsContract.Document.COLUMN_DISPLAY_NAME, file.name)
         add(DocumentsContract.Document.COLUMN_LAST_MODIFIED, file.lastModified())
         add(DocumentsContract.Document.COLUMN_SIZE, if (file.isFile) file.length() else 0)

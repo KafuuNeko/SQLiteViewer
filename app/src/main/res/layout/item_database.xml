@@ -7,7 +7,6 @@
         <variable
             name="data"
             type="cc.kafuu.sqliteviewer.common.model.SQLiteFile" />
-        <import type="cc.kafuu.sqliteviewer.common.utils.StorageUnitUtilsKt"/>
     </data>
 
     <androidx.cardview.widget.CardView

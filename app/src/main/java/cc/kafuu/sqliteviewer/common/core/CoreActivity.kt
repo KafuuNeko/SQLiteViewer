@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModelProvider
 import cc.kafuu.sqliteviewer.common.manager.ActivityStackManager
 
 
-abstract class CoreActivity<V : ViewDataBinding, VM : CoreViewModel> (
+abstract class CoreActivity<V : ViewDataBinding, VM : CoreViewModel>(
     private val vmClass: Class<VM>,
     private val layoutId: Int,
     private val viewModelId: Int

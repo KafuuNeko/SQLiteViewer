@@ -2,12 +2,9 @@ package cc.kafuu.sqliteviewer.view.activity
 
 import android.content.Context
 import android.content.Intent
-import android.widget.Toast
 import cc.kafuu.sqliteviewer.BR
 import cc.kafuu.sqliteviewer.R
 import cc.kafuu.sqliteviewer.common.core.CoreActivity
-import cc.kafuu.sqliteviewer.common.utils.CommonLibs
-import cc.kafuu.sqliteviewer.common.utils.SQLiteUtils
 import cc.kafuu.sqliteviewer.databinding.ActivityMainBinding
 import cc.kafuu.sqliteviewer.viewmodel.MainViewModel
 
