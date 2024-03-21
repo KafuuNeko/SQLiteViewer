@@ -9,6 +9,6 @@ data class SQLiteFile(val name: String, val file: File, val tableCount: Int, val
     fun getFileDetails(): String {
         val fileSize = file.length().bytesCountToReadableFileSize()
         val lastModified = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(file.lastModified())
-        return "$fileSize Last Modified: $lastModified"
+        return "$fileSize $lastModified"
     }
 }
