@@ -5,4 +5,9 @@
     <string name="btn_create_db_text">创建数据库</string>
     <string name="btn_import_db_text">导入数据库</string>
     <string name="database_not_found">数据库路径为空</string>
+    <string name="table_table_icon">表格小图标</string>
+    <string name="table_view_icon">视图小图标</string>
+    <string name="import_database_failed_tip">导入数据库失败</string>
+    <string name="text_tables">"Tables:"</string>
+    <string name="text_views">Views:</string>
 </resources>

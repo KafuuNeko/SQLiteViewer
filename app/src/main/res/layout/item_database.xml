@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tool="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="data"
+            type="cc.kafuu.sqliteviewer.common.model.SQLiteFile" />
+        <import type="cc.kafuu.sqliteviewer.common.utils.StorageUnitUtilsKt"/>
+    </data>
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:elevation="@dimen/card_default_elevation"
+        app:cardCornerRadius="@dimen/card_default_radius">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="8dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/databaseName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:textColor="@color/color_primary"
+                android:text="@{data.name}" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/databaseSize"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:textColor="@color/gray"
+                android:textSize="14sp"
+                android:text="@{data.getFileDetails()}"
+                android:maxLines="1"
+                android:ellipsize="end"
+                tool:text="2.55MB Last Modified: YYYY-MM-DD HH:MM" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="6dp"
+                android:gravity="center_vertical">
+
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="@string/text_tables"
+                    android:gravity="center"
+                    android:textColor="@color/gray"
+                    android:textSize="14sp"
+                    app:drawableStartCompat="@drawable/ic_table" />
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tableCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="3dp"
+                    android:gravity="center"
+                    android:textColor="@color/gray"
+                    android:textSize="14sp"
+                    android:text="@{String.valueOf(data.tableCount)}"
+                    tool:text="0" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="@string/text_views"
+                    android:gravity="center"
+                    android:textColor="@color/gray"
+                    android:textSize="14sp"
+                    android:layout_marginStart="10dp"
+                    app:drawableStartCompat="@drawable/ic_view"/>
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/viewCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="3dp"
+                    android:gravity="center"
+                    android:textColor="@color/gray"
+                    android:textSize="14sp"
+                    android:text="@{String.valueOf(data.viewCount)}"
+                    tool:text="0" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+</layout>

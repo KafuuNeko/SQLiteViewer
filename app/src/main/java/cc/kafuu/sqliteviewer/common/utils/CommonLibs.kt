@@ -6,11 +6,14 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
+import java.io.File
 
 @SuppressLint("StaticFieldLeak")
 object CommonLibs {
     private lateinit var mContext: Context
     val context: Context get() = mContext
+
+    val sqliteDir get() = File(context.filesDir, "sqlite").also { if (!it.exists()) it.mkdirs() }
 
     fun init(context: Context) {
         mContext = context

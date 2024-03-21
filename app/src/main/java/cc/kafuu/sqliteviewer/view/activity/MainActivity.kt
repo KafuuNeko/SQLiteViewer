@@ -39,12 +39,7 @@ class MainActivity : CoreActivity<ActivityMainBinding, MainViewModel>(
     }
 
     private fun initDatabase() {
-        intent.getStringExtra("sqlite_path")?.let {
-            mViewModel.sqlite.value = SQLiteUtils(it)
-        } ?: {
-            Toast.makeText(this, R.string.database_not_found, Toast.LENGTH_SHORT).show()
-            finish()
-        }
+
     }
 
     private fun onOpenDatabase() {
