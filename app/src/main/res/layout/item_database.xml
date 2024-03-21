@@ -30,12 +30,13 @@
                 android:id="@+id/databaseName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="18sp"
+                android:textSize="14sp"
                 android:textStyle="bold"
                 android:maxLines="1"
                 android:ellipsize="end"
                 android:textColor="@color/color_primary"
-                android:text="@{data.name}" />
+                android:text="@{data.name}"
+                tool:text="Database.db"/>
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/databaseSize"
