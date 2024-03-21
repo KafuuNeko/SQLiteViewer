@@ -13,7 +13,8 @@ object CommonLibs {
     private lateinit var mContext: Context
     val context: Context get() = mContext
 
-    val sqliteDir get() = File(context.filesDir, "sqlite").also { if (!it.exists()) it.mkdirs() }
+    val rootDir get() = context.getExternalFilesDir(null) ?: throw NullPointerException()
+    val sqliteDir get() = getDir("share/sqlite")
 
     fun init(context: Context) {
         mContext = context
@@ -22,4 +23,6 @@ object CommonLibs {
     fun getString(@StringRes id: Int) = context.resources?.getString(id).toString()
     fun getColor(@ColorRes color: Int) = ContextCompat.getColor(context, color)
     fun getDrawable(@DrawableRes id: Int) = ContextCompat.getDrawable(context, id)
+
+    private fun getDir(child: String) = File(rootDir, child).also { if (!it.exists()) it.mkdirs() }
 }
