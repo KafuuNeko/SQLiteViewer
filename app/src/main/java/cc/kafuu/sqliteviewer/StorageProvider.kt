@@ -19,6 +19,7 @@ class StorageProvider : DocumentsProvider() {
         private val defaultDocumentProjection = arrayOf(
             DocumentsContract.Document.COLUMN_DOCUMENT_ID,
             DocumentsContract.Document.COLUMN_DISPLAY_NAME,
+            DocumentsContract.Document.COLUMN_FLAGS,
             DocumentsContract.Document.COLUMN_SIZE,
             DocumentsContract.Document.COLUMN_MIME_TYPE,
             DocumentsContract.Document.COLUMN_LAST_MODIFIED
@@ -27,6 +28,7 @@ class StorageProvider : DocumentsProvider() {
         private val defaultRootProjection = arrayOf(
             DocumentsContract.Root.COLUMN_ROOT_ID,
             DocumentsContract.Root.COLUMN_TITLE,
+            DocumentsContract.Root.COLUMN_FLAGS,
             DocumentsContract.Root.COLUMN_DOCUMENT_ID,
             DocumentsContract.Root.COLUMN_ICON
         )
@@ -123,12 +125,19 @@ class StorageProvider : DocumentsProvider() {
 
 
     private fun modeToAccessMode(mode: String): Int {
-        return when {
-            mode.contains("w") -> ParcelFileDescriptor.MODE_READ_WRITE
-            mode.contains("r") -> ParcelFileDescriptor.MODE_READ_ONLY
-            else -> throw IllegalArgumentException("Unsupported mode: $mode")
+        var accessMode = ParcelFileDescriptor.MODE_READ_ONLY
+        if (mode.contains("w")) {
+            accessMode = ParcelFileDescriptor.MODE_READ_WRITE
+            if (mode.contains("a")) {
+                accessMode = accessMode or ParcelFileDescriptor.MODE_APPEND
+            }
+            if (mode.contains("t")) {
+                accessMode = accessMode or ParcelFileDescriptor.MODE_TRUNCATE
+            }
         }
+        return accessMode
     }
+
 
     private fun getTypeForFile(file: File): String {
         if (!file.isFile) {
