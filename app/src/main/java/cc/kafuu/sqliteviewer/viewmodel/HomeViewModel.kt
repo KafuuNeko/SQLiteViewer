@@ -8,7 +8,6 @@ import cc.kafuu.sqliteviewer.common.utils.CommonLibs
 import cc.kafuu.sqliteviewer.common.utils.SQLiteUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
@@ -19,7 +18,9 @@ class HomeViewModel : CoreViewModel() {
     fun doLoadSqliteFiles() {
         viewModelScope.launch(Dispatchers.IO) {
             val files = CommonLibs.sqliteDir.listFiles()
-            val newSqliteFiles = files?.mapNotNull { file ->
+            val newSqliteFiles = files?.filter {
+                it.name.endsWith(".db")
+            }?.mapNotNull { file ->
                 readSqliteFile(file)
             }.orEmpty()
             sqliteFiles.postValue(newSqliteFiles)
