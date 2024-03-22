@@ -10,4 +10,7 @@
     <string name="import_database_failed_tip">导入数据库失败</string>
     <string name="text_tables">"Tables:"</string>
     <string name="text_views">Views:</string>
+    <string name="ic_save_as_content_description">保存为</string>
+    <string name="ic_delete_content_description">删除</string>
+    <string name="ic_rename_content_description">重命名</string>
 </resources>
