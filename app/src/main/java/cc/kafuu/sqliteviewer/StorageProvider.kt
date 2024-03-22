@@ -7,10 +7,12 @@ import android.os.ParcelFileDescriptor
 import android.provider.DocumentsContract
 import android.provider.DocumentsProvider
 import android.util.Log
+import androidx.core.net.toUri
 import cc.kafuu.sqliteviewer.common.utils.CommonLibs
 import cc.kafuu.sqliteviewer.common.utils.MimeTypeUtils
 import java.io.File
 import java.io.FileNotFoundException
+import java.io.IOException
 
 class StorageProvider : DocumentsProvider() {
     companion object {
@@ -46,35 +48,27 @@ class StorageProvider : DocumentsProvider() {
                 DocumentsContract.Root.FLAG_SUPPORTS_SEARCH
     }
 
-    override fun onCreate(): Boolean {
-        return true
-    }
+    override fun onCreate() = true
 
-    override fun queryRoots(projection: Array<out String>?): Cursor {
-        Log.d(TAG, "queryRoots: ")
-        val result = MatrixCursor(projection ?: DEFAULT_ROOT_PROJECTION)
-
-        result.newRow().apply {
-            add(DocumentsContract.Root.COLUMN_ROOT_ID, "/share")
-            add(DocumentsContract.Root.COLUMN_TITLE, CommonLibs.getString(R.string.app_name))
-            add(DocumentsContract.Root.COLUMN_FLAGS, ROOT_FLAGS)
-            add(DocumentsContract.Root.COLUMN_DOCUMENT_ID, "/share")
-            add(DocumentsContract.Root.COLUMN_ICON, R.drawable.ic_launcher)
+    override fun queryRoots(projection: Array<out String>?): Cursor =
+        MatrixCursor(projection ?: DEFAULT_ROOT_PROJECTION).apply {
+            newRow().apply {
+                add(DocumentsContract.Root.COLUMN_ROOT_ID, "/share")
+                add(DocumentsContract.Root.COLUMN_TITLE, CommonLibs.getString(R.string.app_name))
+                add(DocumentsContract.Root.COLUMN_FLAGS, ROOT_FLAGS)
+                add(DocumentsContract.Root.COLUMN_DOCUMENT_ID, "/share")
+                add(DocumentsContract.Root.COLUMN_ICON, R.drawable.ic_launcher)
+            }
         }
-
-        return result
-    }
 
 
     override fun queryDocument(documentId: String?, projection: Array<out String>?) =
         MatrixCursor(projection ?: DEFAULT_DOCUMENT_PROJECTION).apply {
             if (documentId == null) {
-                return@apply
+                throw IllegalStateException("documentId cannot be empty")
             }
-            val file = File(CommonLibs.rootDir, documentId)
-            Log.d(TAG, "queryDocument: $file")
             newRow().apply {
-                fileRow(file, "$documentId")
+                fileRow(File(CommonLibs.rootDir, documentId), documentId)
             }
         }
 
@@ -85,7 +79,7 @@ class StorageProvider : DocumentsProvider() {
         sortOrder: String?
     ) = MatrixCursor(projection ?: DEFAULT_DOCUMENT_PROJECTION).apply {
         if (parentDocumentId == null) {
-            return@apply
+            throw IllegalStateException("parentDocumentId cannot be empty")
         }
         Log.d(TAG, "queryChildDocuments: $parentDocumentId")
         File(CommonLibs.rootDir, parentDocumentId).listFiles()?.forEach {
@@ -101,11 +95,12 @@ class StorageProvider : DocumentsProvider() {
         signal: CancellationSignal?
     ): ParcelFileDescriptor {
         val file = File(CommonLibs.rootDir, documentId)
-
         if (mode.contains("w") && !file.exists()) {
-            file.createNewFile()
+            if (!file.createNewFile()) {
+                Log.e(TAG, "openDocument: Unable to create new file - $file")
+                throw IOException("Unable to create new file")
+            }
         }
-
         return ParcelFileDescriptor.open(file, modeToAccessMode(mode))
     }
 
@@ -129,10 +124,38 @@ class StorageProvider : DocumentsProvider() {
 
 
     override fun deleteDocument(documentId: String) {
-        val file = File(CommonLibs.rootDir, documentId)
-        if (!file.delete()) {
+        if (!File(CommonLibs.rootDir, documentId).delete()) {
+            Log.e(TAG, "deleteDocument: Failed to delete file: $documentId")
             throw FileNotFoundException("Failed to delete file: $documentId")
         }
+    }
+
+    override fun removeDocument(documentId: String?, parentDocumentId: String?) {
+        if (documentId == null || parentDocumentId == null) {
+            Log.e(TAG, "removeDocument: documentId or parentDocumentId is null")
+            throw FileNotFoundException("Document ID or Parent Document ID not provided")
+        }
+
+        val file = File(CommonLibs.rootDir, documentId)
+        Log.d(TAG, "removeDocument: $file")
+        if (!file.exists()) {
+            Log.e(TAG, "removeDocument: File does not exist - $file")
+            throw FileNotFoundException("File does not exist: $file")
+        }
+
+        val deleted = when {
+            file.isDirectory -> file.deleteRecursively()
+            else -> file.delete()
+        }
+        if (!deleted) {
+            Log.e(TAG, "removeDocument: Failed to delete - $file")
+            throw FileNotFoundException("Failed to delete document: $file")
+        }
+
+        CommonLibs.context.contentResolver?.notifyChange(
+            DocumentsContract.buildDocumentUriUsingTree(CommonLibs.rootDir.toUri(), documentId),
+            null
+        )
     }
 
 
