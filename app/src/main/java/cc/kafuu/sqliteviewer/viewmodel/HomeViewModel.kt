@@ -19,7 +19,7 @@ class HomeViewModel : CoreViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             val files = CommonLibs.sqliteDir.listFiles()
             val newSqliteFiles = files?.filter {
-                it.name.endsWith(".db")
+                it.name.endsWith(".sqlite")
             }?.mapNotNull { file ->
                 readSqliteFile(file)
             }.orEmpty()
@@ -29,7 +29,7 @@ class HomeViewModel : CoreViewModel() {
 
     private fun readSqliteFile(file: File): SQLiteFile = SQLiteUtils(file).use { sqliteUtils ->
         SQLiteFile(
-            file.name,
+            file.name.removeSuffix(".sqlite"),
             file,
             sqliteUtils.getEntityCount(SQLiteUtils.ENTITY_TABLE),
             sqliteUtils.getEntityCount(SQLiteUtils.ENTITY_VIEW)
@@ -37,7 +37,7 @@ class HomeViewModel : CoreViewModel() {
     }
 
     fun importSqlite(name: String, istream: InputStream): Boolean {
-        val targetFile = File(CommonLibs.sqliteDir, "$name.db")
+        val targetFile = File(CommonLibs.sqliteDir, "$name.sqlite")
         if (!targetFile.exists()) {
             targetFile.createNewFile()
         }
