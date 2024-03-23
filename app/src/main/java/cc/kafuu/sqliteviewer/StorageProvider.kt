@@ -83,6 +83,9 @@ class StorageProvider : DocumentsProvider() {
         }
         Log.d(TAG, "queryChildDocuments: $parentDocumentId")
         File(CommonLibs.rootDir, parentDocumentId).listFiles()?.forEach {
+            if (it.name.endsWith(".sqlite-journal")) {
+                return@forEach
+            }
             newRow().apply {
                 fileRow(it, "$parentDocumentId/${it.name}")
             }

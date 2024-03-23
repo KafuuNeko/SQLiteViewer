@@ -53,7 +53,8 @@ class HomeViewModel : CoreViewModel() {
     }
 
     fun removeSqlite(sqLiteFile: SQLiteFile) {
-        if (sqLiteFile.file.delete()) {
+        val journalFile = File("${sqLiteFile.file.absolutePath}-journal")
+        if ((!journalFile.exists() || journalFile.delete()) && sqLiteFile.file.delete()) {
             sqliteFiles.value?.toMutableList()?.apply {
                 remove(sqLiteFile)
                 sqliteFiles.postValue(this)
