@@ -13,6 +13,7 @@ import cc.kafuu.sqliteviewer.BR
 import cc.kafuu.sqliteviewer.R
 import cc.kafuu.sqliteviewer.common.adapter.DatabaseListAdapter
 import cc.kafuu.sqliteviewer.common.core.CoreActivity
+import cc.kafuu.sqliteviewer.common.model.SQLiteFile
 import cc.kafuu.sqliteviewer.common.utils.CommonLibs
 import cc.kafuu.sqliteviewer.common.utils.FileUtils.getFileName
 import cc.kafuu.sqliteviewer.databinding.ActivityHomeBinding
@@ -58,8 +59,29 @@ class HomeActivity : CoreActivity<ActivityHomeBinding, HomeViewModel>(
     }
 
     private fun initRv() {
+        val listener = object : DatabaseListAdapter.Companion.IClickedListener {
+            override fun onDelete(data: SQLiteFile) {
+                mViewModel.removeSqlite(data)
+            }
+
+            override fun onRename(data: SQLiteFile) {
+                Toast.makeText(this@HomeActivity, "Not yet implemented", Toast.LENGTH_SHORT).show()
+            }
+
+            override fun onSaveAs(data: SQLiteFile) {
+                Toast.makeText(this@HomeActivity, "Not yet implemented", Toast.LENGTH_SHORT).show()
+            }
+
+            override fun onContent(data: SQLiteFile) {
+                Toast.makeText(this@HomeActivity, "Not yet implemented", Toast.LENGTH_SHORT).show()
+            }
+
+        }
+
         mViewDataBinding.rvSqliteList.layoutManager = LinearLayoutManager(this)
-        mViewDataBinding.rvSqliteList.adapter = DatabaseListAdapter()
+        mViewDataBinding.rvSqliteList.adapter = DatabaseListAdapter().apply {
+            clickedListener = listener
+        }
     }
 
     private fun switchView(emptyView: Boolean) {

@@ -51,4 +51,13 @@ class HomeViewModel : CoreViewModel() {
         }
         return false
     }
+
+    fun removeSqlite(sqLiteFile: SQLiteFile) {
+        if (sqLiteFile.file.delete()) {
+            sqliteFiles.value?.toMutableList()?.apply {
+                remove(sqLiteFile)
+                sqliteFiles.postValue(this)
+            }
+        }
+    }
 }

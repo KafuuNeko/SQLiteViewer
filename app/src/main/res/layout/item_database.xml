@@ -17,6 +17,7 @@
 
 
         <cn.leaqi.drawer.SwipeDrawer
+            android:id="@+id/sd_item"
             android:layout_width="match_parent"
             android:layout_height="70dp"
             app:leftLayout="@id/cl_left_drawer"
